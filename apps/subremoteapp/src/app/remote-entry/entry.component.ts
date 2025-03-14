@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { NxWelcomeComponent } from './nx-welcome.component';
 
 @Component({
-  imports: [CommonModule, NxWelcomeComponent],
+  imports: [CommonModule],
   selector: 'srapp-subremoteapp-entry',
-  template: `<srapp-nx-welcome></srapp-nx-welcome>`,
+  template: `welcome from subremoteapp`,
 })
 export class RemoteEntryComponent {}

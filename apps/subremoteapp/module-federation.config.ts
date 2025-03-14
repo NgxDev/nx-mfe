@@ -4,6 +4,7 @@ const config: ModuleFederationConfig = {
   name: 'subremoteapp',
   exposes: {
     './Routes': 'apps/subremoteapp/src/app/remote-entry/entry.routes.ts',
+    './EntryComponent': 'apps/subremoteapp/src/app/remote-entry/entry.component.ts',
   },
 };
 

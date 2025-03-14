@@ -20,6 +20,9 @@
       ],
       "subremoteapp/Routes": [
         "apps/subremoteapp/src/app/remote-entry/entry.routes.ts"
+      ],
+      "subremoteapp/EntryComponent": [
+        "apps/subremoteapp/src/app/remote-entry/entry.component.ts"
       ]
     }
   },

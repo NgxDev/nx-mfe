@@ -11,8 +11,8 @@ import { RouterModule } from '@angular/router';
     <strong>Remote App Nav:</strong>&nbsp; <a routerLink=".">Remote App</a> |
     <a routerLink="subremoteapp">SubRemote Aapp</a>
     <hr />
+    welcome from remoteapp<br/>
     <router-outlet></router-outlet>
-    <rapp-nx-welcome></rapp-nx-welcome>
   `,
 })
 export class RemoteEntryComponent {}

@@ -6,9 +6,15 @@ export const remoteRoutes: Route[] = [
   { path: '', component: RemoteEntryComponent },
   {
     path: 'subremoteapp',
-    loadChildren: () =>
-      loadRemote<typeof import('subremoteapp/Routes')>(
-        'subremoteapp/Routes'
-      ).then((m) => m!.remoteRoutes),
+    component: RemoteEntryComponent,
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          loadRemote<typeof import('subremoteapp/EntryComponent')>(
+            'subremoteapp/EntryComponent'
+          ).then((m) => m!.RemoteEntryComponent),
+      },
+    ],
   },
 ];

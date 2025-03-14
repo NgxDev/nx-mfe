@@ -1,101 +1,186 @@
 # Org
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
-
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
-
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-
-## Run tasks
-
-To run the dev server for your app, use:
-
+## 1 - Create workspace
+  
 ```sh
-npx nx serve org
+> npx create-nx-workspace org --style=scss --unitTestRunner=jest  
+
+  ✔ Which stack do you want to use? · angular  
+  ✔ Integrated monorepo, or standalone project? · integrated  
+  ✔ Application name · org  
+  ✔ Which bundler would you like to use? · webpack  
+  ✔ Do you want to enable Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering)? · No  
+  ✔ Test runner to use for end to end (E2E) tests · none  
+  ✔ Which CI provider would you like to use? · skip  
+  ✔ Would you like remote caching to make your build faster? · skip 
 ```
 
-To create a production bundle:
+## 2 - Remove existing `org` app
 
 ```sh
-npx nx build org
+> nx g @nx/workspace:remove org
 ```
 
-To see all available targets to run for a project, run:
+## 3 - Create a host application
 
 ```sh
-npx nx show project org
+> nx g @nx/angular:host apps/hostapp --style=scss --prefix=happ --dynamic=true
+
+  ✔ Which unit test runner would you like to use? · jest  
+  ✔ Which E2E test runner would you like to use? · none  
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
+## 4 - Create first remote app
 
 ```sh
-npx nx g @nx/angular:app demo
+> nx g @nx/angular:remote apps/remoteapp --host=hostapp --style=scss --prefix=rapp
+
+  ✔ Which unit test runner would you like to use? · jest  
+  ✔ Which E2E test runner would you like to use? · none  
 ```
 
-To generate a new library, use:
+## 5 - Create second remote app (that should be loaded by the first remote app)
+
+### 5.1 - Use the generate remote command, specifying --host=remoteapp
 
 ```sh
-npx nx g @nx/angular:lib mylib
+> nx g @nx/angular:remote apps/subremoteapp --host=remoteapp --style=scss --prefix=srapp
+
+Error: NX   Cannot read properties of undefined (reading 'getEnd')  
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### 5.2 - Create `apps/remoteapp/public/module-federation.manifest.json` with content `{}`
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
+### 5.3 - Rerun the generate command
 
 ```sh
-npx nx connect
+> nx g @nx/angular:remote apps/subremoteapp --host=remoteapp --style=scss --prefix=srapp
+
+Error: NX   Cannot read properties of null (reading 'includes')
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+### 5.4 - Temporary workaround
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+In `node_modules/@nx/angular/src/generators/setup-mf/lib/add-remote-to-host.js:110`  
+Replace line 110:
 
-### Step 2
+```js
+if (appComponent.includes(`<ul class="remote-menu">`) &&
+```
 
-Use the following command to configure a CI workflow for your workspace:
+with  
+
+```js
+if (appComponent && appComponent.includes(`<ul class="remote-menu">`) &&
+```
+
+### 5.5 Rerun the generate command (this time it will be successful)
 
 ```sh
-npx nx g ci-workflow
+> nx g @nx/angular:remote apps/subremoteapp --host=remoteapp --style=scss --prefix=srapp
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 6 - Try to serve the app
 
-## Install Nx Console
+```sh
+> nx serve hostapp
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+Error: NX   Cannot find module '@rspack/core'  
+```
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Temporary workaound: `npm i --save-dev @rspack/core`  
+(this was not an issue with a previous version of Nx, whatever latest version was available until about a week ago - before 20.5.0)
 
-## Useful links
+## 7 - Load subremoteapp in remoteapp
 
-Learn more:
+### 7.1
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+In `apps/remoteapp/src/main.ts` replace:  
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```ts
+import('./bootstrap').catch((err) => console.error(err));
+```
+
+With:
+
+```ts
+import { init } from '@module-federation/enhanced/runtime';
+
+fetch('/module-federation.manifest.json')
+  .then((res) => res.json())
+  .then((remotes: Record<string, string>) =>
+    Object.entries(remotes).map(([name, entry]) => ({ name, entry }))
+  )
+  .then((remotes) => init({ name: 'remoteapp', remotes }))
+  .then(() => import('./bootstrap').catch((err) => console.error(err)));
+```
+
+### 7.2 - Add `remotes: []` im `apps/remoteapp/module-federation.config.ts`
+
+### 7.3 - Add `<router-outlet>`, navigation links and imports in `apps/remoteapp/src/app/remote-entry/entry.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NxWelcomeComponent } from './nx-welcome.component';
+import { RouterModule } from '@angular/router';
+
+@Component({
+  imports: [CommonModule, RouterModule, NxWelcomeComponent],
+  selector: 'rapp-remoteapp-entry',
+  template: `
+    <hr />
+    <strong>Remote App Nav:</strong>&nbsp; <a routerLink=".">Remote App</a> |
+    <a routerLink="subremoteapp">SubRemote Aapp</a>
+    <hr />
+    <router-outlet></router-outlet>
+    <rapp-nx-welcome></rapp-nx-welcome>
+  `,
+})
+export class RemoteEntryComponent {}
+```
+
+### 7.4 - `nx build hostapp`  
+
+Correctly sees remote dependencies and builds all apps: hostapp, remoteapp and subremoteapp
+
+### 7.5 - `nx serve hostapp`
+
+Try to navigate to `/remoteapp/subremoteapp` using the navigation links: `NG04002: Cannot match any routes. URL Segment: 'remoteapp/subremoteapp`  
+For some reason, the subremoteapp isn't seen. There is no request to `http://localhost:4202/mf-manifest.json` when the remoteapp loads.  
+Also, directly accessing `localhost:4201` (remoteapp) or `localhost:4202` (subremote app) does not work.
+
+### 7.6 - Add 'subremoteapp' to `remotes` in `apps/hostapp/module-federation.config.ts`:
+
+```ts
+import { ModuleFederationConfig } from '@nx/module-federation';
+
+const config: ModuleFederationConfig = {
+  name: 'hostapp',
+  /**
+   * To use a remote that does not exist in your current Nx Workspace
+   * You can use the tuple-syntax to define your remote
+   *
+   * remotes: [['my-external-remote', 'https://nx-angular-remote.netlify.app']]
+   *
+   * You _may_ need to add a `remotes.d.ts` file to your `src/` folder declaring the external remote for tsc, with the
+   * following content:
+   *
+   * declare module 'my-external-remote';
+   *
+   */
+  remotes: ['subremoteapp'], // <<< Add 'subremoteapp'
+};
+
+/**
+ * Nx requires a default export of the config to allow correct resolution of the module federation graph.
+ **/
+export default config;
+```
+
+### 7.7 - Run `nx serve hostapp`  
+
+Now all apps are served. We can access `localhost:4201` (remoteapp - with navigation working, the request for subremoteapp mf-manifest.json is done correctly) and `localhost:4202` (subremoteapp).  
+
+However, when accessing the hostapp `localhost:4200`, the same issue persists.  
+When the remoteapp is loaded by hostapp, there is no request for `http://localhost:4202/mf-manifest.json` (subremoteapp manifest). So the navigation fails.  

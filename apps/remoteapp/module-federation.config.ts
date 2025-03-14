@@ -5,6 +5,7 @@ const config: ModuleFederationConfig = {
   exposes: {
     './Routes': 'apps/remoteapp/src/app/remote-entry/entry.routes.ts',
   },
+  remotes: [],
 };
 
 /**

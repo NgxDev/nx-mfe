@@ -35,6 +35,7 @@
     "@nx/web": "20.5.0",
     "@nx/webpack": "20.5.0",
     "@nx/workspace": "20.5.0",
+    "@rspack/core": "^1.2.8",
     "@schematics/angular": "~19.2.0",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",

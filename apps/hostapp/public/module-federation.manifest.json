@@ -1,3 +1,4 @@
 {
-  "remoteapp": "http://localhost:4201/mf-manifest.json"
+  "remoteapp": "http://localhost:4203/remoteapp/mf-manifest.json",
+  "subremoteapp": "http://localhost:4203/subremoteapp/mf-manifest.json"
 }

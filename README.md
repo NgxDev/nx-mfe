@@ -184,3 +184,7 @@ Now all apps are served. We can access `localhost:4201` (remoteapp - with naviga
 
 However, when accessing the hostapp `localhost:4200`, the same issue persists.  
 When the remoteapp is loaded by hostapp, there is no request for `http://localhost:4202/mf-manifest.json` (subremoteapp manifest). So the navigation fails.  
+
+---
+
+P.S. I've also tried to put the `subremoteapp` route in the entry.routes of `remoteapp` instead of having it in the app.routes, in which case I don't get `ERROR RuntimeError: NG04002: Cannot match any routes. URL Segment: 'remoteapp/subremoteapp'`, but `core.mjs:6726 ERROR Error: [ Federation Runtime ]: Failed to locate remote. #RUNTIME-004 args: {"hostName":"remoteapp","requestId":"subremoteapp/Routes"}` . Which I think makes sense, since I don't see any request for `localhost:4202/mf-manifest.json`

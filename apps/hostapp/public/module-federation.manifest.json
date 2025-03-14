@@ -1,1 +1,3 @@
-{}
+{
+  "remoteapp": "http://localhost:4201/mf-manifest.json"
+}
